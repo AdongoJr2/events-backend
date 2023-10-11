@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshTokenModule } from './features/refresh-token/refresh-token.module';
 
 @Module({
   imports: [
@@ -31,8 +30,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         logging: ['query', 'info', 'error', 'log'],
       }),
     }),
+    RefreshTokenModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
