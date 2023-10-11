@@ -5,6 +5,7 @@ import { RefreshTokenModule } from './features/refresh-token/refresh-token.modul
 import { EventCategoryModule } from './features/event-category/event-category.module';
 import { SharedModule } from './shared/shared.module';
 import { LoggerModule } from './core/modules/logger/logger.module';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerModule } from './core/modules/logger/logger.module';
     LoggerModule,
     RefreshTokenModule,
     EventCategoryModule,
+    UsersModule,
   ],
   providers: [],
 })
