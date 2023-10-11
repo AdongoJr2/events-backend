@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshTokenModule } from './features/refresh-token/refresh-token.module';
+import { EventCategoryModule } from './features/event-category/event-category.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RefreshTokenModule } from './features/refresh-token/refresh-token.modul
       }),
     }),
     RefreshTokenModule,
+    EventCategoryModule,
   ],
   providers: [],
 })
