@@ -7,6 +7,7 @@ import { SharedModule } from './shared/shared.module';
 import { LoggerModule } from './core/modules/logger/logger.module';
 import { UsersModule } from './features/users/users.module';
 import { AuthModule } from './features/auth/auth.module';
+import { EventsModule } from './features/events/events.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AuthModule } from './features/auth/auth.module';
     EventCategoryModule,
     UsersModule,
     AuthModule,
+    EventsModule,
   ],
   providers: [],
 })

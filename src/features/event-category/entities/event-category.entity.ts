@@ -1,5 +1,6 @@
 import { CommonEntityFields } from '../../../utils/entities/CommonEntityFields';
-import { Column, Entity } from 'typeorm';
+import { Event } from '../../../features/events/entities/event.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 export class EventCategory extends CommonEntityFields {
@@ -14,4 +15,7 @@ export class EventCategory extends CommonEntityFields {
     length: 256,
   })
   name: string;
+
+  @OneToMany(() => Event, (event) => event.eventCategory)
+  events: Event[];
 }
