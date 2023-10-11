@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshTokenModule } from './features/refresh-token/refresh-token.module';
 import { EventCategoryModule } from './features/event-category/event-category.module';
+import { SharedModule } from './shared/shared.module';
+import { LoggerModule } from './core/modules/logger/logger.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { EventCategoryModule } from './features/event-category/event-category.mo
         logging: ['query', 'info', 'error', 'log'],
       }),
     }),
+    SharedModule,
+    LoggerModule,
     RefreshTokenModule,
     EventCategoryModule,
   ],
