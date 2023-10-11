@@ -37,7 +37,6 @@ export class UsersService {
       const { offset, limit } = calculateDBOffsetAndLimit({ page, pageSize });
 
       const userAlias = 'user';
-      const playerProfileRelationName = 'playerProfile';
 
       const queryBuilder = this.usersRepository.createQueryBuilder(userAlias);
 
@@ -50,14 +49,7 @@ export class UsersService {
       /* SORT */
       await this.sortService.addSortQuery(queryBuilder, sortQuery);
 
-      return queryBuilder
-        .leftJoinAndSelect(
-          `${userAlias}.${playerProfileRelationName}`,
-          playerProfileRelationName,
-        )
-        .skip(offset)
-        .take(limit)
-        .getManyAndCount();
+      return queryBuilder.skip(offset).take(limit).getManyAndCount();
     } catch (error) {
       throw error;
     }
