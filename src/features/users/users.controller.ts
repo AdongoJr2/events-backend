@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   DefaultValuePipe,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -23,8 +24,13 @@ import { DtoValidationPipe } from 'src/core/pipes/dto-validation/dto-validation.
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DeepPartial } from 'typeorm';
 import { User } from './entities/user.entity';
+import { RolesGuard } from 'src/core/guards/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from 'src/core/decorators/roles.decorator';
+import { UserRole } from 'src/utils/enums';
 
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -136,6 +142,7 @@ export class UsersController {
     }
   }
 
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {

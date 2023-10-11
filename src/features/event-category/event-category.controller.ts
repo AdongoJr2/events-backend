@@ -13,6 +13,7 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { EventCategoryService } from './event-category.service';
 import { CreateEventCategoryDto } from './dto/create-event-category.dto';
@@ -25,8 +26,13 @@ import { DatabaseErrorException } from 'src/utils/exceptions/database-error.exce
 import { InternalServerErrorException } from 'src/utils/exceptions/internal-server-error.exception';
 import { defaultPageValues } from 'src/utils/pagination/pagination';
 import { NotFoundException } from 'src/utils/exceptions/not-found.exception';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/core/guards/roles.guard';
+import { UserRole } from 'src/utils/enums';
+import { Roles } from 'src/core/decorators/roles.decorator';
 
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('event-categories')
 export class EventCategoryController {
   constructor(
@@ -36,6 +42,7 @@ export class EventCategoryController {
   ) {}
 
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   @Post()
   async create(
     @Body(DtoValidationPipe) createEventCategoryDto: CreateEventCategoryDto,
@@ -126,6 +133,7 @@ export class EventCategoryController {
     }
   }
 
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -154,6 +162,7 @@ export class EventCategoryController {
     }
   }
 
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
