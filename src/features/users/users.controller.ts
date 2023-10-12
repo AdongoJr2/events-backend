@@ -28,6 +28,8 @@ import { RolesGuard } from 'src/core/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/core/decorators/roles.decorator';
 import { UserRole } from 'src/utils/enums';
+import { EventCategory } from '../event-category/entities/event-category.entity';
+import { EventCategoryService } from '../event-category/event-category.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -35,6 +37,7 @@ import { UserRole } from 'src/utils/enums';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly eventCategoryService: EventCategoryService,
     private readonly apiResponseService: ApiResponseService,
     private readonly apiListResponseService: ApiListResponseService,
     private readonly logger: Logger,
@@ -115,10 +118,20 @@ export class UsersController {
     try {
       const foundUser = await this.usersService.findOne(id);
 
+      const eventCategories: EventCategory[] = [];
+
+      for (const eventCategoryId of updateUserDto.eventCategoryIds) {
+        const foundEventCategory =
+          await this.eventCategoryService.findOne(eventCategoryId);
+
+        eventCategories.push(foundEventCategory);
+      }
+
       // update user details
       const detailsToUpdate: DeepPartial<User> = {
         ...foundUser,
         ...updateUserDto,
+        interests: eventCategories,
       };
 
       const updateResult = await this.usersService.update(detailsToUpdate);

@@ -7,6 +7,7 @@ import { DeepPartial, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { NotFoundException } from 'src/utils/exceptions/not-found.exception';
 import { CreateUserDto } from './dto/create-user.dto';
+import { EventCategory } from '../event-category/entities/event-category.entity';
 
 @Injectable()
 export class UsersService {
@@ -16,9 +17,15 @@ export class UsersService {
     private sortService: SortService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(
+    createUserDto: CreateUserDto,
+    eventCategories: EventCategory[],
+  ): Promise<User> {
     try {
-      const newUser = this.usersRepository.create(createUserDto);
+      const newUser = this.usersRepository.create({
+        ...createUserDto,
+        interests: eventCategories,
+      });
       const savedUser = await this.usersRepository.save(newUser);
       return new User({ ...savedUser });
     } catch (error) {
@@ -37,6 +44,7 @@ export class UsersService {
       const { offset, limit } = calculateDBOffsetAndLimit({ page, pageSize });
 
       const userAlias = 'user';
+      const userInterestsRelationName = 'interests';
 
       const queryBuilder = this.usersRepository.createQueryBuilder(userAlias);
 
@@ -49,7 +57,19 @@ export class UsersService {
       /* SORT */
       await this.sortService.addSortQuery(queryBuilder, sortQuery);
 
-      return queryBuilder.skip(offset).take(limit).getManyAndCount();
+      return queryBuilder
+        .leftJoinAndSelect(
+          `${userAlias}.${userInterestsRelationName}`,
+          userInterestsRelationName,
+        )
+        .select([userAlias])
+        .addSelect([
+          `${userInterestsRelationName}.id`,
+          `${userInterestsRelationName}.name`,
+        ])
+        .skip(offset)
+        .take(limit)
+        .getManyAndCount();
     } catch (error) {
       throw error;
     }
@@ -59,6 +79,9 @@ export class UsersService {
     try {
       const foundUser = await this.usersRepository.findOne({
         where: { id },
+        relations: {
+          interests: true,
+        },
       });
 
       if (!foundUser) {

@@ -5,9 +5,15 @@ import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiResponseModule } from 'src/core/modules/api-response/api-response.module';
 import { SharedModule } from 'src/shared/shared.module';
+import { EventCategoryModule } from '../event-category/event-category.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), ApiResponseModule, SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    EventCategoryModule,
+    ApiResponseModule,
+    SharedModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [TypeOrmModule, UsersService],

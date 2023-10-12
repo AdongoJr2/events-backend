@@ -14,11 +14,14 @@ import {
   VerifiedToken,
 } from 'src/core/types/token-user-data';
 import { NotFoundException } from 'src/utils/exceptions/not-found.exception';
+import { EventCategoryService } from '../event-category/event-category.service';
+import { EventCategory } from '../event-category/entities/event-category.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
+    private eventCategoryService: EventCategoryService,
     private refreshTokenService: RefreshTokenService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -26,7 +29,19 @@ export class AuthService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const newUser = await this.usersService.createUser(createUserDto);
+      const eventCategories: EventCategory[] = [];
+
+      for (const eventCategoryId of createUserDto.eventCategoryIds) {
+        const foundEventCategory =
+          await this.eventCategoryService.findOne(eventCategoryId);
+
+        eventCategories.push(foundEventCategory);
+      }
+
+      const newUser = await this.usersService.createUser(
+        createUserDto,
+        eventCategories,
+      );
       return new User({ ...newUser });
     } catch (error) {
       throw error;

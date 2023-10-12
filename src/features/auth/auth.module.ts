@@ -8,10 +8,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { LocalStrategy } from './strategies/local.stategy';
+import { EventCategoryModule } from '../event-category/event-category.module';
 
 @Module({
   imports: [
     UsersModule,
+    EventCategoryModule,
     RefreshTokenModule,
     ApiResponseModule,
     PassportModule,
