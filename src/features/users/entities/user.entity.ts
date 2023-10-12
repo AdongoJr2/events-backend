@@ -1,7 +1,8 @@
 import { UserRole } from '../../../utils/enums';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import { CommonEntityFields } from '../../../utils/entities/CommonEntityFields';
 import { Exclude } from 'class-transformer';
+import { EventCategory } from '../../../features/event-category/entities/event-category.entity';
 
 @Entity()
 export class User extends CommonEntityFields {
@@ -65,4 +66,8 @@ export class User extends CommonEntityFields {
   })
   @Exclude()
   passwordResetExpires: Date;
+
+  @ManyToMany(() => EventCategory, (eventCategory) => eventCategory.users)
+  @JoinTable()
+  interests: EventCategory[];
 }
