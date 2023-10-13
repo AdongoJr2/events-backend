@@ -15,6 +15,7 @@ import { EventCategoryModule } from '../event-category/event-category.module';
     SharedModule,
   ],
   controllers: [EventsController],
-  providers: [TypeOrmModule, EventsService],
+  providers: [EventsService],
+  exports: [TypeOrmModule, EventsService],
 })
 export class EventsModule {}

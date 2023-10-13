@@ -10,6 +10,7 @@ import { EventCategory } from '../event-category/entities/event-category.entity'
 import { calculateDBOffsetAndLimit } from 'src/utils/pagination/pagination';
 import { DBSort } from 'src/core/types/db-sort';
 import { NotFoundException } from 'src/utils/exceptions/not-found.exception';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class EventsService {
@@ -68,6 +69,58 @@ export class EventsService {
           eventCategoryRelationName,
         )
         .select([eventAlias])
+        .addSelect([
+          `${eventCategoryRelationName}.id`,
+          `${eventCategoryRelationName}.name`,
+        ])
+        .skip(offset)
+        .take(limit)
+        .getManyAndCount();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllUserInterestingEvents(
+    foundUser: User,
+    page?: number,
+    pageSize?: number,
+    filterQuery?: string,
+    searchQuery?: string,
+    sortQuery?: string,
+  ) {
+    try {
+      const { offset, limit } = calculateDBOffsetAndLimit({ page, pageSize });
+
+      const eventAlias = 'event';
+      const eventCategoryRelationName = 'eventCategory';
+
+      const queryBuilder = this.eventRepository.createQueryBuilder(eventAlias);
+
+      /* SEARCH */
+      await this.filterService.addFiltersQuery(queryBuilder, searchQuery, true);
+
+      /* FILTER */
+      await this.filterService.addFiltersQuery(queryBuilder, filterQuery);
+
+      /* SORT */
+      const defaultSort: DBSort = {
+        sort: `${eventAlias}.eventDate`,
+        order: 'DESC',
+      };
+      await this.sortService.addSortQuery(queryBuilder, sortQuery, defaultSort);
+
+      const eventCategoryIds = foundUser.interests.map((item) => item.id);
+
+      return queryBuilder
+        .leftJoinAndSelect(
+          `${eventAlias}.${eventCategoryRelationName}`,
+          eventCategoryRelationName,
+        )
+        .select([eventAlias])
+        .andWhere(`${eventCategoryRelationName}.id IN (:...eventCategoryIds)`, {
+          eventCategoryIds,
+        })
         .addSelect([
           `${eventCategoryRelationName}.id`,
           `${eventCategoryRelationName}.name`,

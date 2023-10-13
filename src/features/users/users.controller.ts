@@ -30,6 +30,7 @@ import { Roles } from 'src/core/decorators/roles.decorator';
 import { UserRole } from 'src/utils/enums';
 import { EventCategory } from '../event-category/entities/event-category.entity';
 import { EventCategoryService } from '../event-category/event-category.service';
+import { EventsService } from '../events/events.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,6 +38,7 @@ import { EventCategoryService } from '../event-category/event-category.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly eventsService: EventsService,
     private readonly eventCategoryService: EventCategoryService,
     private readonly apiResponseService: ApiResponseService,
     private readonly apiListResponseService: ApiListResponseService,
@@ -68,6 +70,55 @@ export class UsersController {
         search,
         sort,
       );
+
+      const responseBody = this.apiListResponseService.getResponseBody({
+        message: 'Users retrieved successfully',
+        count,
+        pageSize,
+        records: users,
+      });
+
+      return responseBody;
+    } catch (error: any) {
+      // TODO: handle errors thrown by search, sort, and filter
+
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  @Get(':id/events-listing')
+  async findAllUserInterestingEvents(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('page', new DefaultValuePipe(defaultPageValues.page), ParseIntPipe)
+    page: number,
+    @Query(
+      'pageSize',
+      new DefaultValuePipe(defaultPageValues.pageSize),
+      ParseIntPipe,
+    )
+    pageSize: number,
+    @Query('filter', new DefaultValuePipe(''))
+    filter: string,
+    @Query('sort', new DefaultValuePipe(''))
+    sort: string,
+    @Query('search', new DefaultValuePipe(''))
+    search: string,
+  ) {
+    try {
+      const foundUser = await this.usersService.findOne(id);
+      if (!foundUser) {
+        throw new NotFoundException(`User with id: ${id} does not exist`);
+      }
+
+      const [users, count] =
+        await this.eventsService.findAllUserInterestingEvents(
+          foundUser,
+          page,
+          pageSize,
+          filter,
+          search,
+          sort,
+        );
 
       const responseBody = this.apiListResponseService.getResponseBody({
         message: 'Users retrieved successfully',
