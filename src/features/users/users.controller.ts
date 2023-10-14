@@ -31,6 +31,7 @@ import { UserRole } from 'src/utils/enums';
 import { EventCategory } from '../event-category/entities/event-category.entity';
 import { EventCategoryService } from '../event-category/event-category.service';
 import { EventsService } from '../events/events.service';
+import { nearbySort2 } from 'src/utils/functions/location-sort';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -103,6 +104,10 @@ export class UsersController {
     sort: string,
     @Query('search', new DefaultValuePipe(''))
     search: string,
+    @Query('lat', new DefaultValuePipe(''))
+    lat: string,
+    @Query('long', new DefaultValuePipe(''))
+    long: string,
   ) {
     try {
       const foundUser = await this.usersService.findOne(id);
@@ -110,7 +115,7 @@ export class UsersController {
         throw new NotFoundException(`User with id: ${id} does not exist`);
       }
 
-      const [users, count] =
+      const [events, count] =
         await this.eventsService.findAllUserInterestingEvents(
           foundUser,
           page,
@@ -120,11 +125,29 @@ export class UsersController {
           sort,
         );
 
+      let sortedEvents = events;
+
+      // sorting the result from the nearest to the co-ordinates provided
+      if (lat && long) {
+        const userCoordinates = {
+          lat: parseFloat(lat),
+          long: parseFloat(long),
+        };
+
+        const formattedEvents = events.map((event) => ({
+          ...event,
+          lat: event.latitude,
+          long: event.longitude,
+        }));
+
+        sortedEvents = await nearbySort2(userCoordinates, formattedEvents);
+      }
+
       const responseBody = this.apiListResponseService.getResponseBody({
-        message: 'Users retrieved successfully',
+        message: 'Events retrieved successfully',
         count,
         pageSize,
-        records: users,
+        records: sortedEvents,
       });
 
       return responseBody;
