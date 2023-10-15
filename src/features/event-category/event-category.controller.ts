@@ -32,7 +32,7 @@ import { UserRole } from 'src/utils/enums';
 import { Roles } from 'src/core/decorators/roles.decorator';
 
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(RolesGuard)
 @Controller('event-categories')
 export class EventCategoryController {
   constructor(
@@ -42,6 +42,7 @@ export class EventCategoryController {
   ) {}
 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   @Post()
   async create(
@@ -133,6 +134,7 @@ export class EventCategoryController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   @Patch(':id')
   async update(
@@ -162,6 +164,7 @@ export class EventCategoryController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
