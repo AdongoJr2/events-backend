@@ -18,10 +18,10 @@ export class CreateUserDto extends UserBaseDto {
   })
   email: string;
 
-  @IsDefined({
-    message: '$property is required',
-  })
-  phoneNumber: string;
+  // @IsDefined({
+  //   message: '$property is required',
+  // })
+  // phoneNumber: string;
 
   @MinLength(6, {
     message: '$property must be at least $constraint1 characters long',

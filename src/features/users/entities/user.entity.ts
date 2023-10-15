@@ -34,7 +34,7 @@ export class User extends CommonEntityFields {
   email: string;
 
   @Column({
-    unique: true,
+    nullable: true,
   })
   phoneNumber: string;
 
