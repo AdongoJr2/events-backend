@@ -56,7 +56,7 @@ export class AuthService {
     );
 
     if (!foundUser) {
-      // throw new UnauthorizedException('Incorrect email or password');
+      // throw new UnauthorizedException('Incorrect username or password');
       return null;
     }
 
@@ -65,7 +65,7 @@ export class AuthService {
       foundUser.password,
     );
     if (!isPasswordCorrect) {
-      // throw new UnauthorizedException('Incorrect email or password');
+      // throw new UnauthorizedException('Incorrect username or password');
       return null;
     }
 
